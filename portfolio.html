@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio | Gregory Padilha</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;500;600;700&family=Playfair+Display:ital,wght@0,500;0,700;1,500;1,700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        .portfolio-hero {
+            padding: 120px 0 60px 0;
+            text-align: left;
+        }
+        
+        /* Filters */
+        .portfolio-filters {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 64px;
+        }
+        
+        .filter-btn {
+            background: transparent;
+            border: 1px solid var(--outline-variant);
+            color: rgba(255,255,255,0.4);
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            letter-spacing: 0.15em;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .filter-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: rgba(66, 229, 176, 0.05);
+        }
+        
+        .filter-btn.active {
+            background: var(--primary);
+            color: #003828;
+            border-color: var(--primary);
+            font-weight: 800;
+        }
+
+        .portfolio-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            margin-bottom: 120px;
+        }
+
+        .portfolio-item {
+            position: relative;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            display: flex;
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            opacity: 1;
+            transform: scale(1);
+            overflow: hidden;
+        }
+
+        /* Filtering animation state */
+        .portfolio-item.hidden {
+            display: none;
+        }
+        
+        .portfolio-item.filtered-out {
+            opacity: 0;
+            transform: scale(0.9);
+            pointer-events: none;
+            position: absolute; /* Take out of flow during transition */
+        }
+
+        .portfolio-imac {
+            flex: 0 0 50%;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .imac-header {
+            height: 32px;
+            background: rgba(255, 255, 255, 0.02);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            gap: 6px;
+        }
+
+        .mac-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        .mac-dot.red { background: #ff5f56; }
+        .mac-dot.yellow { background: #ffbd2e; }
+        .mac-dot.green { background: #27c93f; }
+
+        .portfolio-img-wrapper {
+            position: relative;
+            width: 100%;
+            height: auto;
+            overflow: hidden;
+        }
+
+        .portfolio-img {
+            display: block;
+            width: 100%;
+            height: auto;
+            opacity: 1;
+            transition: none;
+        }
+
+        .portfolio-item:hover .portfolio-img {
+            /* Static image as requested */
+            transform: none;
+        }
+
+        .portfolio-info {
+            flex: 0 0 50%;
+            padding: 40px 48px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+
+        .portfolio-number {
+            font-family: var(--font-mono);
+            font-size: 48px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.05);
+            position: absolute;
+            top: 32px;
+            left: 48px;
+            line-height: 1;
+            pointer-events: none;
+        }
+
+        .portfolio-info-content {
+            margin-top: 40px;
+            z-index: 2;
+        }
+
+        .portfolio-category {
+            color: var(--primary);
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .portfolio-title {
+            font-size: 28px;
+            margin-bottom: 16px;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: -0.02em;
+        }
+
+        .portfolio-desc {
+            opacity: 0.7;
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 24px;
+            max-width: 90%;
+        }
+
+        .portfolio-link {
+            color: var(--primary);
+            font-size: 15px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .portfolio-link:hover {
+            gap: 12px;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 767px) {
+            .portfolio-hero {
+                padding: 40px 0 20px 0;
+            }
+            .portfolio-item {
+                flex-direction: column;
+            }
+            .portfolio-imac {
+                flex: none;
+                height: auto;
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            }
+            .portfolio-info {
+                flex: none;
+                padding: 32px 24px;
+            }
+            .portfolio-number {
+                top: 24px;
+                left: 24px;
+            }
+            .portfolio-info-content {
+                margin-top: 24px;
+            }
+            .portfolio-desc {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body class="obsidian-theme">
+    <div id="grain-overlay"></div>
+    <div id="grid-canvas"></div>
+    <div id="custom-cursor"></div>
+    <canvas id="cursor-trail-canvas"></canvas>
+    
+    <header class="glass-nav">
+        <div class="nav-content">
+            <div class="logo">
+                <span class="logo-text">GREGORY PADILHA<span id="logo-accent">.</span></span>
+            </div>
+            <nav class="desktop-nav">
+                <a href="/index.html#hero">00 / INÍCIO</a>
+                <a href="/index.html#problem">01 / PROBLEMA</a>
+                <a href="/index.html#process">02 / PROCESSO</a>
+                <a href="/index.html#benefits">03 / FUNCIONALIDADES</a>
+                <a href="/index.html#pricing">04 / PLANOS</a>
+                <a href="/index.html#faq">05 / FAQ</a>
+                <a href="/portfolio.html">TRABALHOS</a>
+                <button class="btn-cta-secondary magnet-btn" onclick="window.location.href='https://wa.me/5554992031543?text=Olá Gregory! Estava vendo seu portfólio e gostaria de conversar sobre um projeto.'"><span class="btn-text">FALE CONOSCO</span></button>
+            </nav>
+
+            <button class="hamburger-btn" id="mobile-toggle" aria-label="Toggle Menu">
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+            </button>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="portfolio-hero reveal active">
+            <p class="section-tag mono">01 / NOSSOS TRABALHOS</p>
+            <h1 class="display-lg">Projetos com alma <br>& <span class="accent-text">Engenharia de conversão.</span></h1>
+            <p class="hero-desc">Uma seleção curada de landing pages que transformaram negócios locais em autoridades digitais.</p>
+            
+            <!-- Filters -->
+            <div class="portfolio-filters mt-48">
+                <button class="filter-btn active mono" data-filter="all">TODOS OS PROJETOS</button>
+                <button class="filter-btn mono" data-filter="fitness">SAÚDE & FITNESS</button>
+                <button class="filter-btn mono" data-filter="medical">NUTRICIONISTAS</button>
+                <button class="filter-btn mono" data-filter="legal">JURÍDICO</button>
+                <button class="filter-btn mono" data-filter="b2b">AGÊNCIA & B2B</button>
+            </div>
+        </section>
+
+        <section class="portfolio-grid">
+            <!-- Empty State Message -->
+            <div id="no-projects-msg" style="display: none; padding: 120px 0; text-align: center; width: 100%; grid-column: 1 / -1;">
+                <p class="mono opacity-50" style="font-size: 14px; letter-spacing: 0.1em; text-transform: uppercase;">Ainda sem projetos nesta categoria, mas logo terá.</p>
+            </div>
+            <!-- Project 1 -->
+            <div class="portfolio-item reveal active" data-category="fitness">
+                <div class="portfolio-imac">
+                    <div class="imac-header">
+                        <div class="mac-dot red"></div>
+                        <div class="mac-dot yellow"></div>
+                        <div class="mac-dot green"></div>
+                    </div>
+                    <div class="portfolio-img-wrapper">
+                        <img src="/trabalho01.png" alt="Rafael Mendes · Iron Method" class="portfolio-img">
+                    </div>
+                </div>
+                <div class="portfolio-info">
+                    <div class="portfolio-number">01</div>
+                    <div class="portfolio-info-content">
+                        <p class="portfolio-category mono">PERSONAL TRAINER / FITNESS</p>
+                        <h3 class="portfolio-title">Renato Piber · Método Piber</h3>
+                        <p class="portfolio-desc">Landing page de alta conversão para consultoria fitness. Design dark premium com accent Cyan, tipografia impactante, grid-system e estrutura focada em autoridade e captação direta de alunos.</p>
+                        <a href="https://renatopiber.netlify.app/" target="_blank" rel="noopener noreferrer" class="portfolio-link">Ver projeto ao vivo &rarr;</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project 2 -->
+            <div class="portfolio-item reveal active" data-category="fitness">
+                <div class="portfolio-imac">
+                    <div class="imac-header">
+                        <div class="mac-dot red"></div>
+                        <div class="mac-dot yellow"></div>
+                        <div class="mac-dot green"></div>
+                    </div>
+                    <div class="portfolio-img-wrapper">
+                        <img src="/trabalho02.png" alt="Ana Fitness" class="portfolio-img">
+                    </div>
+                </div>
+                <div class="portfolio-info">
+                    <div class="portfolio-number">02</div>
+                    <div class="portfolio-info-content">
+                        <p class="portfolio-category mono">PERSONAL TRAINER / FEMININO</p>
+                        <h3 class="portfolio-title">Ana Fitness · Seu corpo mais forte</h3>
+                        <p class="portfolio-desc">LP dark premium com identidade feminina forte. Paleta mauve, tipografia editorial e foco em performance. Transformação real através da disciplina com carregamento instantâneo.</p>
+                        <a href="https://anafitness.netlify.app/" target="_blank" class="portfolio-link">Ver projeto ao vivo &rarr;</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project 3 -->
+            <div class="portfolio-item reveal active" data-category="medical">
+                <div class="portfolio-imac">
+                    <div class="imac-header">
+                        <div class="mac-dot red"></div>
+                        <div class="mac-dot yellow"></div>
+                        <div class="mac-dot green"></div>
+                    </div>
+                    <div class="portfolio-img-wrapper">
+                        <img src="/trabalho03.png" alt="Beatriz Vaz · Metabolismo Inteligente" class="portfolio-img">
+                    </div>
+                </div>
+                <div class="portfolio-info">
+                    <div class="portfolio-number">03</div>
+                    <div class="portfolio-info-content">
+                        <p class="portfolio-category mono">NUTRICIONISTA / WELLNESS</p>
+                        <h3 class="portfolio-title">Beatriz Vaz · Metabolismo Inteligente</h3>
+                        <p class="portfolio-desc">Emagrecimento feminino sem restrições. Descubra como a ciência e o prazer consciente caminham juntos no Método HB.</p>
+                        <a href="https://beatrizvaz.netlify.app/" target="_blank" rel="noopener noreferrer" class="portfolio-link">Ver projeto ao vivo &rarr;</a>
+                    </div>
+                </div>
+            </div>
+
+              <!-- Project 4 -->
+            <div class="portfolio-item reveal active" data-category="medical">
+                <div class="portfolio-imac">
+                    <div class="imac-header">
+                        <div class="mac-dot red"></div>
+                        <div class="mac-dot yellow"></div>
+                        <div class="mac-dot green"></div>
+                    </div>
+                    <div class="portfolio-img-wrapper">
+                        <img src="/trabalho04.png" alt="Dr. Marcos Stark · Estética de Elite" class="portfolio-img">
+                    </div>
+                </div>
+                <div class="portfolio-info">
+                    <div class="portfolio-number">04</div>
+                    <div class="portfolio-info-content">
+                        <p class="portfolio-category mono">NUTRICIONISTA / NUTROLOGIA</p>
+                        <h3 class="portfolio-title">Dr. Marcos Stark · Estética de Elite</h3>
+                        <p class="portfolio-desc">Nutrição de precisão e Biohacking para quem trata o corpo como uma máquina de Fórmula 1. O físico é o reflexo da mente.</p>
+                        <a href="https://marcossktark.netlify.app/" target="_blank" rel="noopener noreferrer" class="portfolio-link">Ver projeto ao vivo &rarr;</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta-section reveal active" style="margin-bottom: 120px; text-align: center;">
+            <h2 class="headline-md">Pronto para criar <br>seu <span class="accent-text">próximo projeto?</span></h2>
+            <div class="flex-center mt-32" style="display: flex; justify-content: center; gap: 16px;">
+                <button class="btn-cta-primary magnet-btn scramble-hover" onclick="window.location.href='https://wa.me/5554992031543?text=Olá Gregory! Acabo de ver sua página de Trabalhos, fiquei muito interessado no seu estilo e gostaria de conversar sobre um projeto.'"><span class="btn-text">Começar Agora</span></button>
+            </div>
+        </section>
+    </main>
+
+    <footer class="full-bleed bg-container" style="border-top: 1px solid var(--outline-variant); padding-top: 80px; padding-bottom: 40px;">
+        <div class="container" style="padding: 0;">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <span class="logo-text">GREGORY PADILHA<span id="logo-accent">.</span></span>
+                    <p class="mt-24" style="max-width: 300px; opacity: 0.7;">Transformamos conhecimento técnico em autoridade digital através de design industrial premium e copy de alta conversão.</p>
+                    <div class="social-icons">
+                        <a href="https://www.instagram.com/gregory.mkt/" class="social-icon-link" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37zM17.5 6.5h.01"/></svg>
+                        </a>
+                        <a href="https://wa.me/5554992031543" class="social-icon-link" aria-label="WhatsApp">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 11-7.6-12.7c.9 0 1.8.1 2.6.4l5.1-1 1 5.1c.3.8.4 1.7.4 2.6z"/></svg>
+                        </a>
+                        <a href="https://www.linkedin.com/in/gregory-padilha-b790a7221" class="social-icon-link" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="footer-links">
+                    <h4 class="mono accent-text mb-24">NAVEGAÇÃO</h4>
+                    <a href="/index.html#hero">Início</a>
+                    <a href="/index.html#problem">Problema</a>
+                    <a href="/index.html#process">Processo</a>
+                    <a href="/index.html#benefits">Funcionalidades</a>
+                    <a href="/index.html#pricing">Planos</a>
+                    <a href="/index.html#faq">FAQ</a>
+                    <a href="/portfolio.html">Trabalhos</a>
+                </div>
+                
+                <div class="footer-contact">
+                    <h4 class="mono accent-text mb-24">CONTATO</h4>
+                    <p>gregorypfborges@gmail.com</p>
+                    <p>+55 54 99203-1543</p>
+                    <p>Caxias do Sul, RS</p>
+                </div>
+
+                <div class="footer-legal">
+                    <h4 class="mono accent-text mb-24">OUTROS</h4>
+                    <a href="#" class="open-policy" data-policy="privacy">Política de Privacidade</a>
+                    <a href="#" class="open-policy" data-policy="terms">Termos de Serviço</a>
+                    <a href="#" class="open-policy" data-policy="cookies">Cookies</a>
+                </div>
+            </div>
+            
+            <div class="footer-bottom mt-80" style="border-top: 1px solid var(--outline-variant); padding-top: 32px; display: flex; justify-content: space-between;">
+                <p class="mono opacity-50">© 2026 Gregory Padilha. ALL RIGHTS RESERVED.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module" src="/main.js"></script>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-nav-overlay" id="mobile-overlay">
+        <button class="menu-close-btn" id="mobile-close" aria-label="Close Menu">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+        <div class="mobile-nav-content">
+            <a href="/index.html#hero" class="mobile-nav-link" id="link-hero"><span class="mono">00 /</span> INÍCIO</a>
+            <a href="/index.html#problem" class="mobile-nav-link" id="link-problem"><span class="mono">01 /</span> PROBLEMA</a>
+            <a href="/index.html#process" class="mobile-nav-link" id="link-process"><span class="mono">02 /</span> PROCESSO</a>
+            <a href="/index.html#benefits" class="mobile-nav-link" id="link-benefits"><span class="mono">03 /</span> FUNCIONALIDADES</a>
+            <a href="/index.html#pricing" class="mobile-nav-link" id="link-pricing"><span class="mono">04 /</span> PLANOS</a>
+            <a href="/index.html#faq" class="mobile-nav-link" id="link-faq"><span class="mono">05 /</span> FAQ</a>
+            <a href="/portfolio.html" class="mobile-nav-link" id="link-portfolio">TRABALHOS</a>
+            <button class="btn-cta-primary mt-32 magnet-btn scramble-hover" style="padding: 24px 48px; width: 100%;" onclick="window.location.href='https://wa.me/5554992031543?text=Olá Gregory! Gostaria de conversar sobre a criação da minha landing page.'"><span class="btn-text">FALE CONOSCO</span></button>
+        </div>
+    </div>
+    <!-- Policy Modal Overlay -->
+    <div class="modal-overlay" id="policy-modal">
+        <div class="modal-container">
+            <button class="modal-close" id="modal-close" aria-label="Fechar">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+            <h2 class="modal-title" id="modal-title">Título</h2>
+            <div class="modal-content" id="modal-content">
+                <!-- Content injected via JS -->
+            </div>
+        </div>
+    </div>
+</body>
+</html>
